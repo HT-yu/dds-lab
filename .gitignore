@@ -1,0 +1,13 @@
+# Imported base-roots filesystem and tarballs
+.base/
+
+# Experiment output
+workspace/logs/
+*.log
+
+# Editor / OS noise
+.vscode/
+.idea/
+.claude/
+Thumbs.db
+desktop.ini

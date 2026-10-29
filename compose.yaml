@@ -1,0 +1,40 @@
+name: dds-lab
+
+services:
+  dds-lab:
+    build:
+      context: .
+      args:
+        BASE_IMAGE: ${BASE_IMAGE:-ubuntu:22.04}
+        UBUNTU_MIRROR: ${UBUNTU_MIRROR:-mirrors.ustc.edu.cn}
+    image: dds-lab:latest
+    container_name: dds-lab
+    hostname: dds-lab
+    init: true
+
+    # iceoryx/RouDi and Fast DDS SHM both use /dev/shm.
+    shm_size: "2gb"
+
+    # Useful for tc/netem and real-time scheduling experiments.
+    cap_add:
+      - NET_ADMIN
+      - SYS_NICE
+
+    volumes:
+      # Sources, downloads, build trees and ccache. Kept in a Docker volume for
+      # fast ext4 I/O instead of compiling through a Windows bind mount.
+      - dds-build:/build
+      # Installed DDS libraries and tools (iceoryx, Fast DDS, Cyclone DDS).
+      - dds-opt:/opt/dds
+      # Experiment code lives on the Windows side and is easy to edit.
+      - ./workspace:/workspace
+      # Edit scripts on Windows and use them immediately in the container.
+      - ./scripts:/usr/local/bin/ddslab:ro
+
+    working_dir: /workspace
+    command: ["sleep", "infinity"]
+    restart: unless-stopped
+
+volumes:
+  dds-build:
+  dds-opt:

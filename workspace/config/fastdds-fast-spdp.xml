@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dds xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+    <profiles>
+        <!-- Experiment E3: 20 initial SPDP announcements every 50 ms, then one
+             per second. hello_world and benchmark call
+             create_participant_with_default_profile(), so this profile must be
+             the default one. Point FASTDDS_DEFAULT_PROFILES_FILE at this file. -->
+        <participant profile_name="lab_fast_spdp" is_default_profile="true">
+            <rtps>
+                <builtin>
+                    <discovery_config>
+                        <discoveryProtocol>SIMPLE</discoveryProtocol>
+                        <leaseDuration>
+                            <sec>30</sec>
+                        </leaseDuration>
+                        <leaseAnnouncement>
+                            <sec>1</sec>
+                        </leaseAnnouncement>
+                        <initialAnnouncements>
+                            <count>20</count>
+                            <period>
+                                <sec>0</sec>
+                                <nanosec>50000000</nanosec>
+                            </period>
+                        </initialAnnouncements>
+                    </discovery_config>
+                </builtin>
+            </rtps>
+        </participant>
+    </profiles>
+</dds>
