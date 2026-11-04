@@ -1,0 +1,28 @@
+# Self-contained variant of the lab image.
+#
+# The upstream Dockerfile ships only the toolchain; sources and the compiled DDS
+# stack live in the `dds-build` / `dds-opt` volumes. This variant bakes both into
+# the image so it can be run anywhere with no volumes and no network:
+#
+#   docker build -f Dockerfile.built -t dds-lab:built .
+#   docker run --rm --shm-size=2gb dds-lab:built \
+#       bash /workspace/experiments/run-all-smoke.sh
+FROM dds-lab:latest
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG JOBS=16
+
+COPY scripts/ /usr/local/bin/ddslab/
+COPY workspace/ /workspace/
+
+RUN set -eux; \
+    chmod +x /usr/local/bin/ddslab/*.sh /workspace/experiments/*.sh; \
+    JOBS="${JOBS}" /usr/local/bin/ddslab/build-all.sh; \
+    # Build trees and tarballs are not needed at runtime; keep /build/src for
+    # the source-level study path (ADVANCED_DDS_STUDY.md).
+    rm -rf /build/build/* /build/downloads/*
+
+RUN /usr/local/bin/ddslab/verify-install.sh
+
+WORKDIR /workspace
+CMD ["sleep", "infinity"]
