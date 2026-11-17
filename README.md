@@ -101,6 +101,20 @@ JOBS=4 /usr/local/bin/ddslab/build-all.sh          # 限制并行度
 DDSLAB_FETCH=always /usr/local/bin/ddslab/build-all.sh  # 强制重新下载源码
 ```
 
+### 自包含镜像（可选）
+
+默认镜像只带工具链，源码和编译产物在数据卷里。`Dockerfile.built` 把它们一并打进镜像，
+运行时不需要数据卷、也不需要联网：
+
+```bash
+docker build -f Dockerfile.built -t dds-lab:built .
+docker run -d --name dds-lab --shm-size=2gb \
+    --cap-add NET_ADMIN --cap-add SYS_NICE dds-lab:built
+docker exec dds-lab bash /workspace/experiments/run-all-smoke.sh
+```
+
+`/workspace` 也复制进了镜像，冒烟脚本直接可用；`/build/src` 保留，便于源码阅读。
+
 ## 运行实验
 
 一条命令跑完全部五项：
